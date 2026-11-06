@@ -182,6 +182,14 @@ function prepare(options = {}) {
     if (!runPrisma(['migrate', 'deploy', '--schema', path.join(APP_DIR, 'prisma', 'schema.prisma')], env)) {
         throw new Error('数据库迁移失败，已停止启动');
     }
+    // 知识图谱：首次安装由 seed.db 自带数据；旧库升级时这里补一次（脚本自带「已有则跳过」）
+    const graphScript = path.join(APP_DIR, 'scripts', 'import-knowledge-graph.mjs');
+    if (fs.existsSync(graphScript)) {
+        const graph = spawnSync(process.execPath, [graphScript], { cwd: APP_DIR, env, stdio: 'inherit', windowsHide: true });
+        if (graph.error || graph.status !== 0) {
+            console.warn('[wrong-notebook] 知识图谱导入失败，跳过：', graph.error ?? graph.status);
+        }
+    }
     const chineseTags = spawnSync(process.execPath, [path.join(APP_DIR, 'dist-scripts', 'scripts', 'seed-chinese-primary.js')], {
         cwd: APP_DIR,
         env,

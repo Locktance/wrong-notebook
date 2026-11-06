@@ -144,7 +144,16 @@ describe('真实 Prisma 数据库迁移', () => {
         for (const item of beforeItems) {
             const group = groups.find((entry) => entry.userId === item.userId && entry.key === item.paperLevel);
             expect(rows('ErrorItem').find((entry) => entry.id === item.id)).toEqual({
-                ...item, paperLevel: group?.id ?? null, figureScale: hasScale ? 65 : 100, figureAlign: 'center', answerSpacePx: null,
+                ...item,
+                paperLevel: group?.id ?? null,
+                figureScale: hasScale ? 65 : 100,
+                figureAlign: 'center',
+                answerSpacePx: null,
+                // 知识图谱字段：新版迁移新增，旧库升级后为 null
+                primaryNodeId: null,
+                relatedNodeIds: null,
+                errorNodeId: null,
+                nodeSource: null,
             });
         }
         expect(relatedTables.map(rows)).toEqual(beforeRelated);
@@ -168,7 +177,7 @@ describe('真实 Prisma 数据库迁移', () => {
             INSERT INTO "ErrorItem" (id, userId, originalImageUrl, paperLevel, figureScale, updatedAt)
                 VALUES ('existing-item', 'existing-user', 'original', 'custom-group', 175, '2026-10-01');
         `);
-        const beforeItems = rows('ErrorItem').map((item) => ({ ...item, figureAlign: 'center', answerSpacePx: null }));
+        const beforeItems = rows('ErrorItem').map((item) => ({ ...item, figureAlign: 'center', answerSpacePx: null, primaryNodeId: null, relatedNodeIds: null, errorNodeId: null, nodeSource: null }));
         const beforeGroups = rows('PaperGroup');
         closeDatabase();
 

@@ -63,6 +63,13 @@ export async function GET(req: Request) {
             },
         });
 
+        // 知识图谱主考点：节点 id 每次安装都不同，导出稳定的上游 cnmId，导入时按 cnmId 还原
+        const primaryNodeIds = [...new Set(errorItems.map((item) => item.primaryNodeId).filter((value): value is string => Boolean(value)))];
+        const primaryNodes = primaryNodeIds.length
+            ? await prisma.knowledgeNode.findMany({ where: { id: { in: primaryNodeIds } }, select: { id: true, cnmId: true } })
+            : [];
+        const primaryNodeCnmIdById = new Map(primaryNodes.map((node) => [node.id, node.cnmId]));
+
         const reviewSchedules = await prisma.reviewSchedule.findMany({
             where: exportAll
                 ? { errorItem: { userId: { not: undefined } } }
@@ -115,7 +122,7 @@ export async function GET(req: Request) {
         ]));
 
         const exportData = {
-            version: 6,
+            version: 7,
             exportedAt: new Date().toISOString(),
             scope: exportAll ? 'all' : 'user',
             user: {
@@ -139,6 +146,7 @@ export async function GET(req: Request) {
             customTags: sortTagsByParent(customTags),
             errorItems: errorItems.map((item) => ({
                 ...item,
+                primaryNodeCnmId: item.primaryNodeId ? (primaryNodeCnmIdById.get(item.primaryNodeId) ?? null) : null,
                 figureScale: normalizeFigureScale(item.figureScale),
                 figureAlign: normalizeFigureAlign(item.figureAlign),
                 answerSpacePx: normalizeCustomAnswerSpacePx(item.answerSpacePx),

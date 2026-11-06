@@ -7,6 +7,8 @@ import { ArrowLeft, FileQuestion, RefreshCw, Trash2 } from "lucide-react";
 import { DifficultyStars } from "@/components/difficulty-stars";
 import { GeogebraSection } from "@/components/error-detail/geogebra-section";
 import { ImageViewer } from "@/components/error-detail/image-viewer";
+import { KnowledgeChainCard } from "@/components/error-detail/knowledge-chain-card";
+import { SectionNav } from "@/components/error-detail/section-nav";
 import { MarkdownFieldCard } from "@/components/error-detail/markdown-field-card";
 import { NotesCard } from "@/components/error-detail/notes-card";
 import { QuestionCard } from "@/components/error-detail/question-card";
@@ -148,7 +150,8 @@ export default function ErrorDetailPage() {
                         <DifficultyStars size="md" value={item.difficultyStars} onChange={handleDifficultyChange} disabled={savingDifficulty} />
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    {/* 操作按钮不参与打印，避免 PDF 里出现「删除」 */}
+                    <div className="flex flex-wrap gap-2 print:hidden">
                         <FixLatexButton errorItemId={item.id} fields={item} onDone={updateItem} />
                         <Link href={`/practice?id=${item.id}`}>
                             <Button variant="outline" size="sm">
@@ -164,10 +167,27 @@ export default function ErrorDetailPage() {
                     </div>
                 </div>
 
+                <SectionNav
+                    items={[
+                        { id: "detail-question", label: t.detail.sectionNav.question },
+                        { id: "detail-mastery", label: t.detail.sectionNav.mastery },
+                        { id: "detail-chain", label: t.detail.sectionNav.chain },
+                        { id: "detail-answer", label: t.detail.sectionNav.answer },
+                        { id: "detail-analysis", label: t.detail.sectionNav.analysis },
+                        { id: "detail-more", label: t.detail.sectionNav.more },
+                    ]}
+                />
+
+                <div id="detail-question" aria-hidden className="scroll-mt-32" />
                 <QuestionCard item={item} educationStage={educationStage} saveFields={saveFields} onUpdate={updateItem} reload={reload} onEnlarge={setViewerImageUrl} />
 
+                <div id="detail-mastery" aria-hidden className="scroll-mt-32" />
                 <MasteryPanel errorItemId={item.id} onMasteryStatusChange={setMasteryStatus} />
 
+                <div id="detail-chain" aria-hidden className="scroll-mt-32" />
+                <KnowledgeChainCard errorItemId={item.id} />
+
+                <div id="detail-answer" aria-hidden className="scroll-mt-32" />
                 <div className="grid gap-6 lg:grid-cols-2">
                     <MarkdownFieldCard
                         title={t.detail.correctAnswer}
@@ -190,6 +210,7 @@ export default function ErrorDetailPage() {
                     <WrongAnswerCard item={item} saveFields={saveFields} onEnlarge={setViewerImageUrl} />
                 </div>
 
+                <div id="detail-analysis" aria-hidden className="scroll-mt-32" />
                 <div className="grid gap-6 lg:grid-cols-2">
                     <MarkdownFieldCard
                         title={t.detail.analysis}
@@ -210,6 +231,7 @@ export default function ErrorDetailPage() {
                     />
                 </div>
 
+                <div id="detail-more" aria-hidden className="scroll-mt-32" />
                 <div className="space-y-6">
                     {svgAnimationEnabled && (
                         // 切换界面语言时自动显示对应语言的动画；key 让播放器随语言重新加载

@@ -142,6 +142,13 @@ model ErrorItem {
 
   // New: many-to-many relation with KnowledgeTag
   tags             KnowledgeTag[]
+
+  // 知识图谱：主考点（单值，一张图只认一根主干）与来源（ai | user）
+  primaryNodeId    String?
+  relatedNodeIds   String?   // 知识图谱：同主考点学段的其它考点 id（JSON 数组），每个考点各生成一条链
+  errorNodeId      String?   // 学生实际出错的考点（AI 依据错误解答/错因判断），用于高亮
+  primaryNode      KnowledgeNode? @relation(fields: [primaryNodeId], references: [id], onDelete: SetNull)
+  nodeSource       String?
   
   // User Metadata
   source           String? // e.g. "Midterm Exam"
@@ -351,4 +358,47 @@ model ImportBatch {
 
   @@unique([userId, clientRequestId])
   @@index([userId, status])
+}
+
+// ===== 知识图谱（K12）=====
+// 节点来自 cn-math-taxonomy 的 topics.json，边来自 dependencies.json。
+// 刻意与 KnowledgeTag 分开：用户在同一学科下已有自己的标签体系，
+// 把 3000+ 图谱节点混进 KnowledgeTag 会污染标签选择器。
+model KnowledgeNode {
+  id                 String   @id @default(cuid())
+  cnmId              String   @unique // 上游 topic id，如 cnm_p002
+  name               String
+  subject            String   // math / english / physics / chinese / ...
+  domain             String?  // 上游 domain，如「数与代数」
+  grade              Int?     // 1~12
+  semester           String?  // 上 / 下
+  chapter            String?  // 如「九年级上册 第25章 一元二次方程」
+  description        String?
+  diagnosticQuestion String?
+  diagnosticAnswer   String?
+
+  // 该节点的前置边（边指向本节点）与它的后继边（本节点作为别人的前置）
+  prerequisiteEdges  KnowledgeEdge[] @relation("EdgeTo")
+  dependentEdges     KnowledgeEdge[] @relation("EdgeFrom")
+
+  errorItems         ErrorItem[]
+
+  createdAt          DateTime @default(now())
+
+  @@index([subject, grade])
+  @@index([name])
+}
+
+model KnowledgeEdge {
+  id         String @id @default(cuid())
+  fromNodeId String // 前置（更基础）
+  toNodeId   String // 后继（更上层）
+  strength   String @default("hard") // hard | soft
+  reason     String?
+
+  fromNode   KnowledgeNode @relation("EdgeFrom", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  toNode     KnowledgeNode @relation("EdgeTo", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+  @@unique([fromNodeId, toNodeId])
+  @@index([toNodeId])
 }

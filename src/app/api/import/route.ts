@@ -100,6 +100,8 @@ interface ImportData {
         mistakeAnalysis: string | null;
         mistakeStatus: string | null;
         knowledgePoints: string | null;
+        // version 7 起导出：知识图谱主考点（上游 cnmId，跨安装稳定）
+        primaryNodeCnmId?: string | null;
         source: string | null;
         errorType: string | null;
         userNotes: string | null;
@@ -552,6 +554,14 @@ export async function POST(req: Request) {
                     resolvedPaperLevel = await getDefaultPaperLevelGroupId(targetUserId, difficultyStars, tx);
                 }
 
+                // 知识图谱主考点：按上游 cnmId 还原到本机节点；旧备份没有该字段则留空
+                const rawPrimaryCnmId = typeof item.primaryNodeCnmId === 'string' && item.primaryNodeCnmId
+                    ? item.primaryNodeCnmId
+                    : null;
+                const primaryNode = rawPrimaryCnmId
+                    ? await tx.knowledgeNode.findUnique({ where: { cnmId: rawPrimaryCnmId }, select: { id: true } })
+                    : null;
+
                 const created = await tx.errorItem.create({
                     data: {
                         shortId: keepShortId ? item.shortId : await generateUniqueShortId(tx),
@@ -566,6 +576,8 @@ export async function POST(req: Request) {
                         mistakeAnalysis: item.mistakeAnalysis,
                         mistakeStatus: item.mistakeStatus,
                         knowledgePoints: item.knowledgePoints,
+                        primaryNodeId: primaryNode?.id ?? null,
+                        nodeSource: primaryNode ? 'user' : null,
                         source: item.source,
                         errorType: item.errorType,
                         userNotes: item.userNotes,

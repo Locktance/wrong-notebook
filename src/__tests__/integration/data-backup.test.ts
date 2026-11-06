@@ -183,9 +183,9 @@ describe('数据导出后再导入（真实 SQLite）', () => {
         expect(await database.knowledgeTag.count({ where: { name: '我的句式笔记' } })).toBe(1);
     });
 
-    it('导出文件使用第 6 版格式，包含 tagSet 字段', async () => {
+    it('导出文件使用第 7 版格式，包含 tagSet 字段', async () => {
         const backup = await exportBackup();
-        expect(backup.version).toBe(6);
+        expect(backup.version).toBe(7);
         expect(backup.paperGroups).toContainEqual(expect.objectContaining({ id: 'group-b', key: 'b', name: 'B卷' }));
         expect(backup.systemTags).toBeDefined();
         expect(backup.subjects).toEqual(
