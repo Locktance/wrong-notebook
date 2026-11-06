@@ -1,6 +1,8 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { isAnswerSpaceMode } from "@/lib/exam-answer-space";
 import type { AnswerSpaceMode } from "@/lib/exam-answer-space";
@@ -27,17 +29,24 @@ interface ToggleOptionProps {
     label: string;
 }
 
+/** 显示内容开关：chip 样式，点击区比原来的小复选框大得多 */
 function ToggleOption({ checked, onChange, label }: ToggleOptionProps) {
     return (
-        <label className="flex items-center gap-1.5 text-xs sm:text-sm cursor-pointer whitespace-nowrap hover:text-primary transition-colors">
-            <input
-                type="checkbox"
-                checked={checked}
-                onChange={(e) => onChange(e.target.checked)}
-                className="rounded border-gray-300 text-primary focus:ring-primary w-3.5 h-3.5 sm:w-4 sm:h-4"
-            />
+        <button
+            type="button"
+            role="switch"
+            aria-checked={checked}
+            onClick={() => onChange(!checked)}
+            className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors sm:text-sm",
+                checked
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground",
+            )}
+        >
+            <Check className={cn("h-3.5 w-3.5", !checked && "opacity-0")} />
             {label}
-        </label>
+        </button>
     );
 }
 
@@ -87,7 +96,7 @@ export function PrintOptions({ options, onChange, hasCustomSpaces, onResetCustom
                 )}
             </div>
 
-            <div className="flex flex-wrap gap-x-3 gap-y-1 sm:gap-4">
+            <div className="flex flex-wrap gap-2">
                 <ToggleOption checked={options.showQuestionText} onChange={(v) => onChange({ showQuestionText: v })} label={t.printPreview?.showQuestionText || 'Question Text'} />
                 <ToggleOption checked={options.showAnswers} onChange={(v) => onChange({ showAnswers: v })} label={t.printPreview?.showAnswers || 'Show Answers'} />
                 <ToggleOption checked={options.showAnalysis} onChange={(v) => onChange({ showAnalysis: v })} label={t.printPreview?.showAnalysis || 'Show Analysis'} />

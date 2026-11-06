@@ -131,6 +131,14 @@ export const translations = {
         app: {
             title: "Smart Error Notebook",
             subtitle: "AI-powered analysis and intelligent review",
+            uploadTips: {
+                title: "Shooting tips",
+                light: "Bright, even light — avoid shadows and glare on the page.",
+                frame: "Keep the whole question and its figure inside the frame.",
+                crop: "Cropping and multi-part capture are available after upload.",
+                afterTitle: "What happens next",
+                after: "AI reads the question, drafts the answer and analysis, and tags knowledge points. You review everything in the next step before it is saved.",
+            },
             dragDrop: "Drag and drop an image here, or click to browse",
             analyzing: "AI is analyzing...",
             compressing: "Compressing image...",
@@ -1869,6 +1877,14 @@ export const translations = {
         app: {
             title: "智能错题本",
             subtitle: "AI 驱动的题目分析与智能复习",
+            uploadTips: {
+                title: "拍摄小贴士",
+                light: "光线均匀，避免阴影和反光压在题目上。",
+                frame: "题目和图形要完整入镜，别裁掉边角。",
+                crop: "拍完可裁剪，也支持分多块拍摄同一道题。",
+                afterTitle: "接下来会怎样",
+                after: "AI 会识别题干、给出解析和答案并标注知识点，你在下一步校对确认后才入库。",
+            },
             dragDrop: "拖拽图片到此处，或点击浏览",
             analyzing: "AI 正在分析...",
             compressing: "正在压缩图片...",

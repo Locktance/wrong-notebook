@@ -93,16 +93,16 @@ export function ImportTaskCard({ task, now, onReview, onViewItem, onRetry, onDis
                         </ul>
                     )}
                 </div>
-            </div>
-            <div className="flex flex-wrap justify-end gap-2">
-                {task.status === "review" && onReview && <Button size="sm" onClick={onReview}>{t.importTasks.continueReview}</Button>}
-                {task.status === "saved" && task.errorItemId && onViewItem && (
-                    <Button size="sm" variant="outline" onClick={onViewItem}>{t.importTasks.viewItem}</Button>
-                )}
-                {task.status === "failed" && onRetry && <Button size="sm" onClick={onRetry}>{t.importTasks.retry}</Button>}
-                {task.status !== "saving" && task.status !== "saved" && onDiscard && (
-                    <Button size="sm" variant="ghost" onClick={onDiscard}>{t.importTasks.discard}</Button>
-                )}
+                <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+                    {task.status === "review" && onReview && <Button size="sm" onClick={onReview}>{t.importTasks.continueReview}</Button>}
+                    {task.status === "saved" && task.errorItemId && onViewItem && (
+                        <Button size="sm" variant="outline" onClick={onViewItem}>{t.importTasks.viewItem}</Button>
+                    )}
+                    {task.status === "failed" && onRetry && <Button size="sm" onClick={onRetry}>{t.importTasks.retry}</Button>}
+                    {task.status !== "saving" && task.status !== "saved" && onDiscard && (
+                        <Button size="sm" variant="ghost" onClick={onDiscard}>{t.importTasks.discard}</Button>
+                    )}
+                </div>
             </div>
         </div>
     );

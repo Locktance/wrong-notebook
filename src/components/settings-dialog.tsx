@@ -44,9 +44,9 @@ interface SettingsTabProps {
 
 function SettingsTab({ value, icon, label }: SettingsTabProps) {
     return (
-        <TabsTrigger value={value} className="px-2 sm:px-3">
+        <TabsTrigger value={value} className="flex-col gap-1 px-1 py-2 sm:flex-row sm:gap-2 sm:px-3 sm:py-1.5">
             {icon}
-            <span className="hidden sm:inline">{label}</span>
+            <span className="text-[11px] leading-tight sm:text-sm">{label}</span>
         </TabsTrigger>
     );
 }

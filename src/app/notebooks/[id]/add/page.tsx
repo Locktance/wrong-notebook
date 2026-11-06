@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Camera, Sparkles } from "lucide-react";
+import { Camera, Lightbulb, ScanLine, Sparkles } from "lucide-react";
 import { BatchImportPanel } from "@/components/batch-import-panel";
 import { CorrectionEditor } from "@/components/correction-editor";
 import { ImageCropper } from "@/components/image-cropper";
@@ -12,6 +12,7 @@ import { QuestionPartsBar } from "@/components/question-parts-bar";
 import { QuestionSaveError } from "@/components/question-save-error";
 import { TextInputZone } from "@/components/text-input-zone";
 import { UploadZone } from "@/components/upload-zone";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressFeedback } from "@/components/ui/progress-feedback";
 import { SegmentedControl } from "@/components/ui/segmented-control";
@@ -62,7 +63,7 @@ export default function AddErrorPage() {
         <main className="min-h-screen">
             <ProgressFeedback status={flow.analysisStep} completed={flow.completedStages} />
 
-            <div className={`mx-auto space-y-6 px-4 py-6 md:px-8 md:py-8 ${flow.step === "review" ? "max-w-6xl" : "max-w-4xl"}`}>
+            <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-8 md:py-8">
                 <QuestionSaveError message={flow.saveError} onDismiss={flow.dismissSaveError} />
                 <PageHeader
                     backHref={`/notebooks/${notebookId}`}
@@ -71,7 +72,8 @@ export default function AddErrorPage() {
                 />
 
                 {flow.step === "upload" && (
-                    <div className="space-y-4">
+                    <div className={inputMode === "image" ? "grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]" : "space-y-4"}>
+                        <div className="min-w-0 space-y-4">
                         <SegmentedControl
                             options={[
                                 { value: "image" as const, icon: Camera, label: t.app?.uploadImage || "Take Photo" },
@@ -115,6 +117,36 @@ export default function AddErrorPage() {
                                 onCreateBatch={flow.createTextBatch}
                                 creatingBatch={flow.creatingBatch}
                             />
+                        )}
+                        </div>
+
+                        {inputMode === "image" && (
+                            <aside className="space-y-3 lg:sticky lg:top-20 lg:self-start">
+                                <Card className="border-border/70">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="flex items-center gap-2 text-sm">
+                                            <Lightbulb className="h-4 w-4 text-primary" />
+                                            {t.app.uploadTips.title}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2 text-xs leading-relaxed text-muted-foreground">
+                                        <p>{t.app.uploadTips.light}</p>
+                                        <p>{t.app.uploadTips.frame}</p>
+                                        <p>{t.app.uploadTips.crop}</p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="border-border/70">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="flex items-center gap-2 text-sm">
+                                            <ScanLine className="h-4 w-4 text-primary" />
+                                            {t.app.uploadTips.afterTitle}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-xs leading-relaxed text-muted-foreground">
+                                        {t.app.uploadTips.after}
+                                    </CardContent>
+                                </Card>
+                            </aside>
                         )}
                     </div>
                 )}
