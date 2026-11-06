@@ -145,11 +145,35 @@
       linear-gradient(to bottom, oklch(0.94 0.05 268 / 0.9), transparent 320px),
       /* 左上靛蓝、右上紫、底部青三团光晕 */
       radial-gradient(78rem 38rem at 4% -14%, oklch(0.8 0.16 268 / 1), transparent 62%),
-      radial-gradient(56rem 30rem at 104% -10%, oklch(0.82 0.15 305 / 0.95), transparent 58%),
-      radial-gradient(46rem 26rem at 50% 116%, oklch(0.86 0.1 200 / 0.8), transparent 62%);
-    background-size: 24px 24px, auto, auto, auto, auto;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-    background-attachment: fixed, fixed, fixed, fixed, fixed;
+      radial-gradient(56rem 30rem at 104% -10%, oklch(0.82 0.15 305 / 0.95), transparent 58%);
+    background-size: 24px 24px, auto, auto, auto;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+    background-attachment: fixed, fixed, fixed, fixed;
+  }
+
+  /* 底部呼吸光：一团缓慢明暗/缩放的柔光，给页面一点“活着”的感觉 */
+  body::after {
+    content: "";
+    position: fixed;
+    left: 50%;
+    bottom: -11rem;
+    width: 84rem;
+    height: 36rem;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, oklch(0.76 0.17 268 / 0.75), oklch(0.82 0.13 200 / 0.45) 55%, transparent 74%);
+    filter: blur(48px);
+    pointer-events: none;
+    z-index: -1;
+    animation: soft-breathe 8s ease-in-out infinite;
+  }
+
+  @keyframes soft-breathe {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.95; transform: translateX(-50%) scale(1.06); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after { animation: none; opacity: 0.55; }
   }
 
   /* 深色模式：同位置换成更暗的光晕，避免底纹发灰发脏 */
@@ -161,6 +185,10 @@
       radial-gradient(56rem 30rem at 104% -10%, oklch(0.47 0.15 305 / 0.8), transparent 58%);
     background-size: 24px 24px, auto, auto, auto;
     background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  }
+
+  html.dark body::after {
+    background: radial-gradient(closest-side, oklch(0.44 0.17 268 / 0.7), oklch(0.48 0.14 200 / 0.4) 55%, transparent 74%);
   }
 }
 
@@ -180,6 +208,10 @@
   .dark {
     color-scheme: light !important;
     --background: #ffffff;
+  }
+
+  body::after {
+    display: none !important;
   }
 
   html,
