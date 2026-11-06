@@ -143,8 +143,12 @@ function PrintPreviewContent() {
                 </div>
             </div>
 
-            {/* Print Content */}
-            <div className="max-w-4xl mx-auto p-8 print:p-0">
+            {/* Print Content：窄屏按 A4 比例缩小后字看不清，改为给一个最小可读宽度并允许横向滑动 */}
+            <p className="mx-auto max-w-4xl px-8 pt-4 text-xs text-muted-foreground sm:hidden">
+                {t.printPreview?.mobileScrollHint || "左右滑动查看完整版式"}
+            </p>
+            <div className="overflow-x-auto print:overflow-visible">
+            <div className="mx-auto max-w-4xl p-8 print:p-0 max-sm:min-w-[680px]">
                 {selectedItems.map((item, index) => (
                     <PrintableQuestion
                         key={item.id}
@@ -164,6 +168,7 @@ function PrintPreviewContent() {
                             : (t.printPreview?.noItems || 'No matching error items')}
                     </div>
                 )}
+            </div>
             </div>
         </>
     );

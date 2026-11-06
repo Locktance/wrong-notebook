@@ -55,7 +55,7 @@ export function ErrorItemCard({ item, selectMode, selected, onToggleSelect, sele
             )}
             <Link href={selectMode ? "#" : `/error-items/${item.id}`} onClick={(e) => selectMode && e.preventDefault()}>
                 {/* 悬浮只用中性色（浮起、加深阴影、灰底、加深上右下边框），左侧状态色条保持不变，避免与「复习中」的主色混淆 */}
-                <Card className={`h-full cursor-pointer gap-2 rounded-2xl border-l-4 pt-4 transition-all duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-lg ${MASTERY_STATUS_BORDER[status]} ${selectMode && selected ? "ring-2 ring-primary" : "hover:border-y-foreground/25 hover:border-r-foreground/25"}`}>
+                <Card className={`h-full cursor-pointer gap-2 rounded-2xl border-l-4 pt-3 transition-all sm:pt-4 duration-200 hover:-translate-y-1 hover:bg-muted/60 hover:shadow-lg ${MASTERY_STATUS_BORDER[status]} ${selectMode && selected ? "ring-2 ring-primary" : "hover:border-y-foreground/25 hover:border-r-foreground/25"}`}>
                     <CardHeader className="pb-0">
                         <div className={`flex justify-between items-start ${selectMode ? "pl-7" : ""}`}>
                             <MasteryStatusBadge status={status} />
@@ -68,15 +68,15 @@ export function ErrorItemCard({ item, selectMode, selected, onToggleSelect, sele
                             </span>
                         </div>
                     </CardHeader>
-                    <CardContent>
-                        <QuestionSummary text={item.questionText} maxLength={SUMMARY_LENGTH} className="text-sm line-clamp-3" />
-                        <div className="flex flex-wrap items-center gap-2 mt-3">
+                    <CardContent className="px-4 sm:px-6">
+                        <QuestionSummary text={item.questionText} maxLength={SUMMARY_LENGTH} className="text-sm line-clamp-2 sm:line-clamp-3" />
+                        <div className="flex flex-wrap items-center gap-2 mt-2.5 sm:mt-3">
                             <Badge variant="secondary" className="text-xs">
                                 {getMistakeStatusLabel(item.mistakeStatus, language)}
                             </Badge>
                             <DifficultyStars value={item.difficultyStars} showUnrated={false} />
                         </div>
-                        <div className="flex flex-wrap gap-2 mt-3">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2.5 sm:mt-3">
                             {(tagsExpanded ? tags : tags.slice(0, VISIBLE_TAGS)).map((tag) => (
                                 <Badge
                                     key={tag}

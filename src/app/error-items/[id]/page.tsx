@@ -120,7 +120,10 @@ export default function ErrorDetailPage() {
 
     const deleteItem = async () => {
         if (!item) return;
-        if (!(await confirmDialog(t.common?.messages?.confirmDelete || 'Are you sure you want to delete this error item?', { destructive: true }))) return;
+        const confirmMessage = item.shortId
+            ? `${t.common?.messages?.confirmDelete || "Are you sure you want to delete this error item?"}（${item.shortId}）`
+            : (t.common?.messages?.confirmDelete || "Are you sure you want to delete this error item?");
+        if (!(await confirmDialog(confirmMessage, { destructive: true, confirmText: t.detail.delete }))) return;
 
         try {
             await apiClient.delete(`/api/error-items/${item.id}/delete`);
