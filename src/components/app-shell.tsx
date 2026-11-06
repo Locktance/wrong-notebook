@@ -56,11 +56,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="min-h-screen">
-            <header className="sticky top-0 z-40 border-b bg-gradient-to-b from-card/95 to-card/70 backdrop-blur-md print:hidden">
-                {/* 底边一条主色渐变光带，让顶栏与页面之间有个过渡，而不是一条硬线 */}
-                <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-                {/* 顶端一条很细的品牌色条：和首页 hero 的靛紫呼应，顶栏不再是一条纯白 */}
-                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/70 via-violet-500/40 to-transparent" />
+            {/* 顶栏用实色，底边不做硬分隔线，改为一段很短的下沿渐变，避免和内容之间出现一条「缝」 */}
+            <header className="sticky top-0 z-40 bg-card print:hidden">
+                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-card to-transparent" />
                 <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 md:h-16 md:px-8">
                     <Link href="/" className="flex shrink-0 items-center gap-2">
                         <Image src="/icons/icon.png" alt="" width={32} height={32} className="rounded-lg" priority unoptimized />
