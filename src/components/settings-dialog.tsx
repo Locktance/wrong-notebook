@@ -104,6 +104,8 @@ export function SettingsDialog() {
         }
     };
 
+    // 记住当前 tab，底部操作条按 tab 切换按钮文案
+    const [activeTab, setActiveTab] = useState("general");
     const saveButton = (label: string) => (
         <Button onClick={handleSaveSettings} disabled={saving} className="w-full">
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -119,7 +121,7 @@ export function SettingsDialog() {
                     <span className="sr-only">{t.settings?.title || "Settings"}</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent ref={dialogContentRef} className="w-[calc(100vw-2rem)] sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
+            <DialogContent ref={dialogContentRef} className="flex max-h-[85vh] w-[calc(100vw-2rem)] flex-col overflow-hidden sm:max-w-[900px]">
                 <DialogHeader>
                     <DialogTitle>{t.settings?.title || "Settings"}</DialogTitle>
                     <DialogDescription>
@@ -127,8 +129,8 @@ export function SettingsDialog() {
                     </DialogDescription>
                 </DialogHeader>
 
-                <Tabs defaultValue="general" className="w-full">
-                    <TabsList className={`grid w-full grid-cols-4 ${isAdmin ? 'sm:grid-cols-7' : 'sm:grid-cols-4'} gap-1 h-auto`}>
+                <Tabs defaultValue="general" onValueChange={setActiveTab} className="flex min-h-0 w-full flex-1 flex-col">
+                    <TabsList className={`grid w-full shrink-0 grid-cols-4 ${isAdmin ? 'sm:grid-cols-7' : 'sm:grid-cols-4'} gap-1 h-auto`}>
                         <SettingsTab value="general" icon={<Languages className="h-4 w-4 sm:mr-2" />} label={t.settings?.tabs?.general || "General"} />
                         <SettingsTab value="account" icon={<User className="h-4 w-4 sm:mr-2" />} label={t.settings?.tabs?.account || "Account"} />
                         {isAdmin && (
@@ -142,27 +144,25 @@ export function SettingsDialog() {
                         <SettingsTab value="about" icon={<Info className="h-4 w-4 sm:mr-2" />} label={t.settings?.tabs?.about || "About"} />
                     </TabsList>
 
-                    <TabsContent value="general" className="space-y-4 py-4">
+                    <TabsContent value="general" className="min-h-0 flex-1 space-y-4 overflow-y-auto py-4 pr-1">
                         <GeneralSettings config={config} setConfig={setConfig} isAdmin={isAdmin} disabled={loading || saving} />
                         <PaperGroupSettings />
-                        {isAdmin && saveButton(t.settings?.save || "Save Settings")}
                     </TabsContent>
 
-                    <TabsContent value="account" className="space-y-4 py-4">
+                    <TabsContent value="account" className="min-h-0 flex-1 space-y-4 overflow-y-auto py-4 pr-1">
                         <AccountSettings />
                     </TabsContent>
 
-                    <TabsContent value="ai" className="space-y-4 py-4">
+                    <TabsContent value="ai" className="min-h-0 flex-1 space-y-4 overflow-y-auto py-4 pr-1">
                         <AiProviderSettings config={config} setConfig={setConfig} loading={loading} saving={saving} onSave={handleSaveSettings} />
                         {!loading && <TtsSettings config={config} setConfig={setConfig} saving={saving} onSave={handleSaveSettings} />}
                     </TabsContent>
 
-                    <TabsContent value="prompts" className="space-y-4 py-4">
+                    <TabsContent value="prompts" className="min-h-0 flex-1 space-y-4 overflow-y-auto py-4 pr-1">
                         <PromptSettings
                             config={config}
                             onUpdate={(type, value) => setConfig(prev => ({ ...prev, prompts: { ...prev.prompts, [type]: value } }))}
                         />
-                        {saveButton(t.settings?.prompts?.save || "Save Prompt Settings")}
                     </TabsContent>
 
                     {isAdmin && (
@@ -197,17 +197,25 @@ export function SettingsDialog() {
                         </TabsContent>
                     )}
 
-                    <TabsContent value="danger" className="space-y-4 py-4">
+                    <TabsContent value="danger" className="min-h-0 flex-1 space-y-4 overflow-y-auto py-4 pr-1">
                         <div className="space-y-3">
                             <DataBackupSettings isAdmin={isAdmin} />
                             <DangerZoneSettings isAdmin={isAdmin} />
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="about" className="space-y-4 py-4">
+                    <TabsContent value="about" className="min-h-0 flex-1 space-y-4 overflow-y-auto py-4 pr-1">
                         <AboutSettings />
                     </TabsContent>
                 </Tabs>
+                {/* 保存按钮常驻底部：内容再长也不用滚到底才能保存 */}
+                {(activeTab === "prompts" || (activeTab === "general" && isAdmin)) && (
+                    <div className="mt-2 shrink-0 border-t pt-3">
+                        {saveButton(activeTab === "general"
+                            ? (t.settings?.save || "Save Settings")
+                            : (t.settings?.prompts?.save || "Save Prompt Settings"))}
+                    </div>
+                )}
             </DialogContent>
         </Dialog>
     );

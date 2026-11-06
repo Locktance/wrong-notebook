@@ -465,6 +465,7 @@ export const translations = {
         tags: {
             title: "Tag Management",
             subtitle: "View and manage knowledge point tags",
+            tagCount: "{count} tags",
             unitChapters: "chapters",
             otherGroup: "Other",
             tabs: {
@@ -535,6 +536,9 @@ export const translations = {
             lastWeek: "Last Week",
             lastMonth: "Last Month",
             filteringByTag: "Filtering by tag",
+            button: "Filters",
+            more: "More",
+            clear: "Clear filters",
             grade: "Grade/Semester",
             paperLevel: "Paper Level",
             gradeShort: "Grade",
@@ -2198,6 +2202,7 @@ export const translations = {
         },
         tags: {
             title: "标签管理",
+            tagCount: "{count} 个知识点",
             subtitle: "查看和管理知识点标签",
             unitChapters: "章",
             otherGroup: "其他",
@@ -2269,6 +2274,9 @@ export const translations = {
             lastWeek: "最近一周",
             lastMonth: "最近一个月",
             filteringByTag: "按标签筛选",
+            button: "筛选",
+            more: "更多",
+            clear: "清除筛选",
             grade: "年级/学期",
             paperLevel: "所属卷等级",
             gradeShort: "年级/学期",

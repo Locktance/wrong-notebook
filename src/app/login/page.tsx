@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { AuthShell } from "@/components/auth-shell";
 import { SetupGuide } from "@/components/initialize/setup-guide";
 import { LoginHelp } from "@/components/login-help";
@@ -72,12 +72,7 @@ export default function LoginPage() {
 
     return (
         <AuthShell>
-            <Card className="w-full rounded-2xl border-0 shadow-xl shadow-indigo-500/5 ring-1 ring-border">
-                <CardHeader>
-                    <CardTitle className="text-2xl text-center">
-                        {t.auth?.login?.title || 'Login'}
-                    </CardTitle>
-                </CardHeader>
+            <Card className="w-full rounded-2xl border-0 py-7 shadow-xl shadow-indigo-500/5 ring-1 ring-border">
                 <CardContent className="space-y-4">
                     {!initialized && <SetupGuide />}
                     <form onSubmit={handleSubmit} className="space-y-4">

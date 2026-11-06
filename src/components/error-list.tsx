@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { GitCompareArrows, Inbox, ListChecks, Printer, Search } from "lucide-react";
+import { ChevronDown, GitCompareArrows, Inbox, ListChecks, MoreHorizontal, Printer, Search, SlidersHorizontal, X } from "lucide-react";
 import { ErrorItemCard } from "@/components/error-list/error-item-card";
 import { FilterMenu } from "@/components/error-list/filter-menu";
 import { PaperLevelFilter } from "@/components/error-list/paper-level-filter";
@@ -10,6 +10,7 @@ import { ErrorListSelectionBar } from "@/components/error-list-selection-bar";
 import { KnowledgeFilter } from "@/components/knowledge-filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
@@ -48,6 +49,8 @@ export function ErrorList({ subjectId, subjectName, tagSet = 'default' }: ErrorL
     const [gradeFilter, setGradeFilter] = useState("");
     const [chapterFilter, setChapterFilter] = useState("");
     const [paperLevelFilter, setPaperLevelFilter] = useState<PaperLevel>("all");
+    // 筛选面板默认收起，只在用户主动展开时出现
+    const [showFilters, setShowFilters] = useState(false);
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
     // 分页状态
     const [page, setPage] = useState(1);
@@ -63,6 +66,19 @@ export function ErrorList({ subjectId, subjectName, tagSet = 'default' }: ErrorL
         subjectId, search, mastery: masteryFilter, timeRange: timeFilter, tag: selectedTag,
         gradeSemester: gradeFilter, chapter: chapterFilter, paperLevel: paperLevelFilter,
     }), [subjectId, search, masteryFilter, timeFilter, selectedTag, gradeFilter, chapterFilter, paperLevelFilter]);
+
+    const hasFilters = masteryFilter !== "all" || timeFilter !== "all" || paperLevelFilter !== "all"
+        || Boolean(selectedTag) || Boolean(gradeFilter) || Boolean(chapterFilter);
+    const activeFilterCount = [masteryFilter !== "all", timeFilter !== "all", paperLevelFilter !== "all", Boolean(selectedTag), Boolean(gradeFilter), Boolean(chapterFilter)]
+        .filter(Boolean).length;
+    const clearFilters = () => {
+        setMasteryFilter("all");
+        setTimeFilter("all");
+        setPaperLevelFilter("all");
+        setSelectedTag(null);
+        setGradeFilter("");
+        setChapterFilter("");
+    };
 
     const handleFilterChange = ({ gradeSemester, chapter, tag }: KnowledgeFilterChange) => {
         if (gradeSemester !== undefined) setGradeFilter(gradeSemester);
@@ -152,7 +168,7 @@ export function ErrorList({ subjectId, subjectName, tagSet = 'default' }: ErrorL
 
     return (
         <div className={`space-y-6 ${isSelectMode ? "pb-40 sm:pb-24" : ""}`}>
-            <div className="flex flex-col gap-3 lg:flex-row">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                 <div className="relative w-full lg:flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -170,32 +186,65 @@ export function ErrorList({ subjectId, subjectName, tagSet = 'default' }: ErrorL
                         }}
                     />
                 </div>
-                <div className="flex flex-wrap gap-2">
-                    <FilterMenu mastery={masteryFilter} timeRange={timeFilter} onMasteryChange={setMasteryFilter} onTimeRangeChange={setTimeFilter} />
-                    <Button variant="outline" size="sm" className="h-10" onClick={() => router.push(`/print-preview?${buildErrorListParams(filters).toString()}`)}>
-                        <Printer className="mr-2 h-4 w-4" />
-                        {t.notebook?.exportPrint || "Export for Print"}
+                <div className="flex flex-wrap items-center gap-2">
+                    {/* 高频：筛选条件收进可折叠面板，按钮上带生效数量 */}
+                    <Button
+                        variant={hasFilters ? "secondary" : "outline"}
+                        size="sm"
+                        className="h-10"
+                        aria-expanded={showFilters}
+                        onClick={() => setShowFilters((value) => !value)}
+                    >
+                        <SlidersHorizontal className="mr-2 h-4 w-4" />
+                        {t.filter.button}
+                        {activeFilterCount > 0 && (
+                            <Badge className="ml-2 h-5 min-w-5 rounded-full px-1.5 text-[11px] tabular-nums">{activeFilterCount}</Badge>
+                        )}
+                        <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${showFilters ? "rotate-180" : ""}`} />
                     </Button>
-                    {!isSelectMode && (
-                        <Button variant="outline" size="sm" className="h-10" onClick={toggleSelectMode}>
-                            <GitCompareArrows className="mr-2 h-4 w-4" />
-                            {t.questionSimilarity.title}
-                        </Button>
-                    )}
+
+                    {/* 低频：导出打印、相似度比较 */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-10" aria-label={t.filter.more}>
+                                <MoreHorizontal className="h-4 w-4 sm:mr-2" />
+                                <span className="hidden sm:inline">{t.filter.more}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => router.push(`/print-preview?${buildErrorListParams(filters).toString()}`)}>
+                                <Printer className="mr-2 h-4 w-4" />
+                                {t.notebook?.exportPrint || "Export for Print"}
+                            </DropdownMenuItem>
+                            {!isSelectMode && (
+                                <DropdownMenuItem onClick={toggleSelectMode}>
+                                    <GitCompareArrows className="mr-2 h-4 w-4" />
+                                    {t.questionSimilarity.title}
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <Button variant={isSelectMode ? "secondary" : "outline"} size="sm" className="h-10" onClick={toggleSelectMode}>
-                        <ListChecks className="mr-2 h-4 w-4" />
-                        {isSelectMode ? (t.notebook?.cancelSelect || "Cancel") : (t.notebook?.selectMode || "Select")}
+                        <ListChecks className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">{isSelectMode ? (t.notebook?.cancelSelect || "Cancel") : (t.notebook?.selectMode || "Select")}</span>
                     </Button>
                 </div>
             </div>
 
-            {/* Advanced Filters Row */}
-            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                <div className="w-full sm:w-auto">
+            {showFilters && (
+                <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-card p-3 sm:flex-row sm:flex-wrap sm:items-center">
+                    <FilterMenu mastery={masteryFilter} timeRange={timeFilter} onMasteryChange={setMasteryFilter} onTimeRangeChange={setTimeFilter} />
                     <KnowledgeFilter gradeSemester={gradeFilter} tag={selectedTag} onFilterChange={handleFilterChange} subjectName={subjectName} tagSet={tagSet} />
+                    <PaperLevelFilter value={paperLevelFilter} onChange={setPaperLevelFilter} />
+                    {hasFilters && (
+                        <Button variant="ghost" size="sm" className="sm:ml-auto" onClick={clearFilters}>
+                            <X className="mr-1.5 h-3.5 w-3.5" />
+                            {t.filter.clear}
+                        </Button>
+                    )}
                 </div>
-                <PaperLevelFilter value={paperLevelFilter} onChange={setPaperLevelFilter} />
-            </div>
+            )}
 
             {selectedTag && (
                 <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
