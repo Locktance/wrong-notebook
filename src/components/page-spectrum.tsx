@@ -20,7 +20,7 @@ const WAVE_CRESTS = 3;
 function barStyle(index: number) {
     // 基础轮廓：3 个波峰的柔和正弦，避免静态时是一排随机高矮
     const envelope = 0.5 + 0.5 * Math.sin((index / BAR_COUNT) * Math.PI * 2 * WAVE_CRESTS);
-    const height = 24 + envelope * 86;
+    const height = 14 + envelope * 52;
     return {
         height: `${height}px`,
         animationDuration: `${DURATION}s`,
@@ -32,7 +32,7 @@ export function PageSpectrum() {
     return (
         <div
             aria-hidden
-            className="pointer-events-none fixed inset-x-0 bottom-0 -z-10 flex h-[140px] items-end gap-[2px] overflow-hidden px-1 opacity-85 print:hidden"
+            className="pointer-events-none fixed inset-x-0 bottom-0 -z-10 flex h-[100px] items-end gap-[2px] overflow-hidden px-1 opacity-80 print:hidden"
         >
             {Array.from({ length: BAR_COUNT }, (_, index) => (
                 <span
