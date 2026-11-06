@@ -139,23 +139,28 @@
     -webkit-tap-highlight-color: transparent;
     /* 页面底纹：细点阵 + 两团靛蓝/紫光晕，避免大片纯色背景显得空 */
     background-image:
-      radial-gradient(circle at 1px 1px, oklch(0.55 0.03 264 / 0.07) 1px, transparent 0),
-      radial-gradient(82rem 40rem at 2% -18%, oklch(0.86 0.11 268 / 1), transparent 62%),
-      radial-gradient(58rem 30rem at 104% -12%, oklch(0.88 0.1 305 / 0.85), transparent 58%),
-      radial-gradient(46rem 26rem at 50% 116%, oklch(0.92 0.05 200 / 0.6), transparent 62%);
-    background-size: 24px 24px, auto, auto, auto;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-    background-attachment: fixed, fixed, fixed, fixed;
+      /* 点阵纹理 */
+      radial-gradient(circle at 1px 1px, oklch(0.5 0.04 264 / 0.16) 1px, transparent 0),
+      /* 顶部一条由浅到无的色带，让页面顶部有明确的“天光” */
+      linear-gradient(to bottom, oklch(0.94 0.05 268 / 0.9), transparent 320px),
+      /* 左上靛蓝、右上紫、底部青三团光晕 */
+      radial-gradient(78rem 38rem at 4% -14%, oklch(0.8 0.16 268 / 1), transparent 62%),
+      radial-gradient(56rem 30rem at 104% -10%, oklch(0.82 0.15 305 / 0.95), transparent 58%),
+      radial-gradient(46rem 26rem at 50% 116%, oklch(0.86 0.1 200 / 0.8), transparent 62%);
+    background-size: 24px 24px, auto, auto, auto, auto;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+    background-attachment: fixed, fixed, fixed, fixed, fixed;
   }
 
   /* 深色模式：同位置换成更暗的光晕，避免底纹发灰发脏 */
   html.dark body {
     background-image:
-      radial-gradient(circle at 1px 1px, oklch(0.98 0 0 / 0.04) 1px, transparent 0),
-      radial-gradient(82rem 40rem at 2% -18%, oklch(0.4 0.11 268 / 0.55), transparent 62%),
-      radial-gradient(58rem 30rem at 104% -12%, oklch(0.42 0.1 305 / 0.5), transparent 58%);
-    background-size: 24px 24px, auto, auto;
-    background-repeat: repeat, no-repeat, no-repeat;
+      radial-gradient(circle at 1px 1px, oklch(0.98 0 0 / 0.07) 1px, transparent 0),
+      linear-gradient(to bottom, oklch(0.3 0.07 268 / 0.75), transparent 320px),
+      radial-gradient(78rem 38rem at 4% -14%, oklch(0.45 0.16 268 / 0.85), transparent 62%),
+      radial-gradient(56rem 30rem at 104% -10%, oklch(0.47 0.15 305 / 0.8), transparent 58%);
+    background-size: 24px 24px, auto, auto, auto;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
   }
 }
 
