@@ -137,6 +137,25 @@
   body {
     @apply bg-background text-foreground;
     -webkit-tap-highlight-color: transparent;
+    /* 页面底纹：细点阵 + 两团靛蓝/紫光晕，避免大片纯色背景显得空 */
+    background-image:
+      radial-gradient(circle at 1px 1px, oklch(0.55 0.03 264 / 0.07) 1px, transparent 0),
+      radial-gradient(82rem 40rem at 2% -18%, oklch(0.86 0.11 268 / 1), transparent 62%),
+      radial-gradient(58rem 30rem at 104% -12%, oklch(0.88 0.1 305 / 0.85), transparent 58%),
+      radial-gradient(46rem 26rem at 50% 116%, oklch(0.92 0.05 200 / 0.6), transparent 62%);
+    background-size: 24px 24px, auto, auto, auto;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+    background-attachment: fixed, fixed, fixed, fixed;
+  }
+
+  /* 深色模式：同位置换成更暗的光晕，避免底纹发灰发脏 */
+  html.dark body {
+    background-image:
+      radial-gradient(circle at 1px 1px, oklch(0.98 0 0 / 0.04) 1px, transparent 0),
+      radial-gradient(82rem 40rem at 2% -18%, oklch(0.4 0.11 268 / 0.55), transparent 62%),
+      radial-gradient(58rem 30rem at 104% -12%, oklch(0.42 0.1 305 / 0.5), transparent 58%);
+    background-size: 24px 24px, auto, auto;
+    background-repeat: repeat, no-repeat, no-repeat;
   }
 }
 
@@ -160,6 +179,7 @@
 
   html,
   body {
+    background-image: none !important;
     background-color: #ffffff !important;
     color: var(--foreground) !important;
     color-scheme: light !important;
