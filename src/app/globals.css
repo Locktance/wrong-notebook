@@ -151,17 +151,10 @@
     background-attachment: fixed, fixed, fixed, fixed;
   }
 
-  /* 底部波浪：两层波形横向缓慢流动（页面组件 page-wave 里使用） */
-  @keyframes wave-drift {
-    from { transform: translate3d(0, 0, 0); }
-    to { transform: translate3d(-50%, 0, 0); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .motion-safe\:animate-\[wave-drift_26s_linear_infinite\],
-    .motion-safe\:animate-\[wave-drift_17s_linear_infinite\] {
-      animation: none !important;
-    }
+  /* 底部频谱条：柱条做纵向缩放，形成起伏（页面组件 page-spectrum 里使用） */
+  @keyframes spectrum {
+    0%, 100% { transform: scaleY(0.35); opacity: 0.55; }
+    50% { transform: scaleY(1); opacity: 1; }
   }
 
   /* 深色模式：同位置换成更暗的光晕，避免底纹发灰发脏 */
