@@ -7,6 +7,7 @@ import { signOut, useSession } from "next-auth/react";
 import { BarChart3, BookOpen, CalendarCheck, FileText, LogOut, PlusCircle, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ImportTasksIndicator } from "@/components/import-tasks/import-tasks-indicator";
+import { PageWave } from "@/components/page-wave";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="min-h-screen">
+            <PageWave />
             {/* 顶栏用实色，底边不做硬分隔线，改为一段很短的下沿渐变，避免和内容之间出现一条「缝」 */}
             <header className="sticky top-0 z-40 bg-card print:hidden">
                 <span aria-hidden className="pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-card to-transparent" />
