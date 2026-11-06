@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
-import { PageLoading } from "@/components/ui/page-loading";
+import { CardGridSkeleton, PageHeaderSkeleton, Skeleton } from "@/components/ui/skeleton";
 import { ShortIdLocator } from "@/components/short-id-locator";
 import { BookOpen, Plus } from "lucide-react";
 import { NotebookCard } from "@/components/notebook-card";
@@ -13,8 +13,10 @@ import { CreateNotebookDialog, type CreateNotebookInput } from "@/components/cre
 
 import { Notebook } from "@/types/api";
 import { apiClient } from "@/lib/api-client";
+import { formatDateTime } from "@/lib/date-time";
 
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTimeZone } from "@/contexts/TimeZoneContext";
 import { usePageTitle } from "@/lib/page-title";
 import { toast } from "@/lib/feedback";
 import { frontendLogger } from "@/lib/frontend-logger";
@@ -23,6 +25,7 @@ import { getApiErrorMessage } from "@/lib/error-message";
 export default function NotebooksPage() {
     const router = useRouter();
     const { t } = useLanguage(); // Use hook
+    const { timeZone } = useTimeZone();
     usePageTitle(t.notebooks.title);
     const [notebooks, setNotebooks] = useState<Notebook[]>([]);
     const [loading, setLoading] = useState(true);
@@ -60,7 +63,15 @@ export default function NotebooksPage() {
     };
 
     if (loading) {
-        return <PageLoading label={t.common.loading} />;
+        return (
+            <main className="mx-auto min-h-screen max-w-6xl px-4 py-6 md:px-8 md:py-8">
+                <div className="space-y-6">
+                    <PageHeaderSkeleton />
+                    <Skeleton className="h-10 w-full max-w-sm" />
+                    <CardGridSkeleton count={3} />
+                </div>
+            </main>
+        );
     }
 
     return (
@@ -99,6 +110,9 @@ export default function NotebooksPage() {
                                 stage={notebook.stage}
                                 subjectKey={notebook.subjectKey}
                                 errorCount={notebook._count?.errorItems || 0}
+                                updatedLabel={notebook.updatedAt
+                                    ? t.notebooks.updatedAt.replace("{date}", formatDateTime(notebook.updatedAt, "MM/dd", timeZone))
+                                    : undefined}
                                 onClick={() => handleNotebookClick(notebook.id)}
                                 itemLabel={t.notebooks.cardItems}
                             />

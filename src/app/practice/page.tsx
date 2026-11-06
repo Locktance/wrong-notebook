@@ -1,10 +1,10 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
@@ -21,7 +21,6 @@ export const dynamic = 'force-dynamic';
 
 function PracticeContent() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const errorItemId = searchParams.get("id");
     const { t, language } = useLanguage();
     usePageTitle(t.practice.title);
@@ -33,18 +32,13 @@ function PracticeContent() {
     }
 
     return (
-        <div className="max-w-3xl mx-auto space-y-8">
-            <div className="flex justify-between items-center mb-4">
-                <Button variant="ghost" onClick={() => router.back()}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    {t.common?.back || "Back"}
-                </Button>
-            </div>
-            <div className="text-center space-y-4">
-                <h1 className="text-3xl font-bold">{t.practice.title}</h1>
-                <p className="text-muted-foreground">
-                    {t.practice.subtitle}
-                </p>
+        <div className="max-w-3xl mx-auto space-y-6">
+            <PageHeader
+                title={t.practice.title}
+                description={t.practice.subtitle}
+                backHref={`/error-items/${errorItemId}`}
+            />
+            <div className="space-y-4">
 
                 {session.error && (
                     <div className="relative rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive" role="alert">
@@ -60,7 +54,7 @@ function PracticeContent() {
                 )}
 
                 {!question && !session.loadingCached && (
-                    <div className="flex flex-col items-center gap-4">
+                    <div className="flex flex-col items-start gap-4">
                         <DifficultyPicker value={session.difficulty} onChange={session.setDifficulty} />
                         <GenerateButton loading={loading} onClick={session.generateQuestion} />
                     </div>

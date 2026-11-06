@@ -102,7 +102,7 @@ function HomeContent() {
                             targetNotebook={initialNotebookId ? targetNotebook?.name : undefined}
                         />
 
-                        <div className="space-y-4">
+                        <div id="upload-zone" className="scroll-mt-20 space-y-4">
                             <SegmentedControl options={inputModes} value={inputMode} onChange={setInputMode} />
 
                             {flow.pendingTask && (

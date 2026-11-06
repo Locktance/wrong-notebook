@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
-import { PageLoading } from "@/components/ui/page-loading";
+import { CardGridSkeleton } from "@/components/ui/skeleton";
 import { ExamCreateForm } from "@/components/exam/exam-create-form";
 import { ExamStatusBadge } from "@/components/exam/exam-status-badge";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -54,7 +54,7 @@ export default function ExamsPage() {
                 <section className="space-y-3">
                     <h2 className="text-lg font-semibold">{t.exam.list}</h2>
                     {papers === null ? (
-                        <PageLoading />
+                        <CardGridSkeleton count={4} columns={2} />
                     ) : papers.length === 0 ? (
                         <EmptyState icon={FileText} title={t.exam.empty} className="py-10" />
                     ) : (

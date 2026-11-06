@@ -2,38 +2,16 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 
 import { Loader2, TrendingUp, CheckCircle, BookOpen } from "lucide-react";
+import { ChartTooltip } from "@/components/ui/chart-tooltip";
+import { StatCard } from "@/components/ui/stat-card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { apiClient } from "@/lib/api-client";
+import { chartColor, CHART_AXIS, CHART_GRID } from "@/lib/chart-theme";
 import { frontendLogger } from "@/lib/frontend-logger";
 import { AnalyticsData } from "@/types/api";
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
-
-/** recharts 传给自定义提示框的参数（只列出用到的字段） */
-interface ChartTooltipProps {
-    active?: boolean;
-    payload?: Array<{ name?: string | number; value?: string | number; color?: string }>;
-    label?: string | number;
-}
-
-function ActivityTooltip({ active, payload, label, activityLabel }: ChartTooltipProps & { activityLabel: string }) {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
-                <p className="font-medium mb-1">{label}</p>
-                <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-violet-500" />
-                    <span className="text-muted-foreground">{activityLabel}:</span>
-                    <span className="font-bold">{payload[0].value}</span>
-                </div>
-            </div>
-        );
-    }
-    return null;
-}
 
 export function WrongAnswerStats() {
     const [data, setData] = useState<AnalyticsData | null>(null);
@@ -66,49 +44,36 @@ export function WrongAnswerStats() {
 
     if (!data) return null;
 
-    return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h2 className="text-2xl font-bold tracking-tight">
-                {t.wrongAnswerStats.title}
-            </h2>
+    const subjectTotal = data.subjectStats.reduce((sum, entry) => sum + entry.value, 0);
 
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{t.wrongAnswerStats.totalErrors}</CardTitle>
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.totalErrors}</div>
-                        <p className="text-xs text-muted-foreground">
-                            {t.wrongAnswerStats.totalErrorsDesc}
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{t.wrongAnswerStats.mastered}</CardTitle>
-                        <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.masteredCount}</div>
-                        <p className="text-xs text-muted-foreground">
-                            {t.wrongAnswerStats.masteredDesc}
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{t.wrongAnswerStats.masteryRate}</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.masteryRate}%</div>
-                        <p className="text-xs text-muted-foreground">
-                            {t.wrongAnswerStats.masteryRateDesc}
-                        </p>
-                    </CardContent>
-                </Card>
+    return (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* 标题由外层 PageHeader 与 Tab 承担，这里只放指标和三张图 */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <StatCard
+                    label={t.wrongAnswerStats.totalErrors}
+                    value={data.totalErrors}
+                    hint={t.wrongAnswerStats.totalErrorsDesc}
+                    icon={BookOpen}
+                    tone="primary"
+                    hintClassName="hidden sm:block"
+                />
+                <StatCard
+                    label={t.wrongAnswerStats.mastered}
+                    value={data.masteredCount}
+                    hint={t.wrongAnswerStats.masteredDesc}
+                    icon={CheckCircle}
+                    tone="success"
+                    hintClassName="hidden sm:block"
+                />
+                <StatCard
+                    label={t.wrongAnswerStats.masteryRate}
+                    value={`${data.masteryRate}%`}
+                    hint={t.wrongAnswerStats.masteryRateDesc}
+                    icon={TrendingUp}
+                    tone="warning"
+                    hintClassName="hidden sm:block"
+                />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -124,18 +89,36 @@ export function WrongAnswerStats() {
                                     data={data.subjectStats}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    paddingAngle={5}
+                                    innerRadius="36%"
+                                    outerRadius="50%"
+                                    fill="var(--chart-1)"
+                                    paddingAngle={data.subjectStats.length > 1 ? 4 : 0}
                                     dataKey="value"
-                                    label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                    stroke="var(--card)"
+                                    strokeWidth={data.subjectStats.length > 1 ? 2 : 0}
                                 >
                                     {data.subjectStats.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={chartColor(index)} />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip content={<ChartTooltip />} />
+                                <Legend
+                                    iconType="circle"
+                                    iconSize={8}
+                                    content={() => (
+                                        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-2 text-xs text-muted-foreground">
+                                            {data.subjectStats.map((entry, index) => (
+                                                <span key={entry.name} className="flex items-center gap-1.5">
+                                                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColor(index) }} />
+                                                    {entry.name}
+                                                    <span className="tabular-nums text-foreground/70">
+                                                        {subjectTotal > 0 ? Math.round((entry.value / subjectTotal) * 100) : 0}%
+                                                    </span>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -150,31 +133,19 @@ export function WrongAnswerStats() {
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data.activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <defs>
-                                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
+                                    <linearGradient id="wrongAnswerBarFill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.85} />
+                                        <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.15} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                                <XAxis
-                                    dataKey="date"
-                                    stroke="#888888"
-                                    fontSize={12}
-                                    tickLine={false}
-                                    axisLine={false}
-                                    dy={10}
-                                />
-                                <YAxis
-                                    stroke="#888888"
-                                    fontSize={12}
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickFormatter={(value) => `${value}`}
-                                />
-                                <Tooltip content={<ActivityTooltip activityLabel={t.wrongAnswerStats.activity} />} cursor={{ fill: 'transparent' }} />
+                                <CartesianGrid {...CHART_GRID} vertical={false} />
+                                <XAxis dataKey="date" {...CHART_AXIS} dy={10} />
+                                <YAxis {...CHART_AXIS} tickFormatter={(value) => `${value}`} />
+                                <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--muted)", fillOpacity: 0.4 }} />
                                 <Bar
                                     dataKey="count"
-                                    fill="url(#colorCount)"
+                                    name={t.wrongAnswerStats.activity}
+                                    fill="url(#wrongAnswerBarFill)"
                                     radius={[4, 4, 0, 0]}
                                     barSize={40}
                                 />

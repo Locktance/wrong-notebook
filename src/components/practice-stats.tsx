@@ -2,21 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChartTooltip } from "@/components/ui/chart-tooltip";
+import { StatCard } from "@/components/ui/stat-card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { Loader2, TrendingUp, BookOpen, Target } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { CHART_AXIS, CHART_GRID, CHART_SEMANTIC, chartColor } from "@/lib/chart-theme";
 import { frontendLogger } from "@/lib/frontend-logger";
 import type { Translations } from "@/lib/translations";
 import { PracticeStatsData } from "@/types/api";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 const DIFFICULTY_COLORS: Record<string, string> = {
-    'easy': '#4ade80',   // Green-400
-    'medium': '#facc15', // Yellow-400
-    'hard': '#fb923c',   // Orange-400
-    'harder': '#f87171', // Red-400
-    'Unknown': '#94a3b8' // Slate-400
+    'easy': CHART_SEMANTIC.easy,
+    'medium': CHART_SEMANTIC.medium,
+    'hard': CHART_SEMANTIC.hard,
+    'harder': CHART_SEMANTIC.harder,
+    'Unknown': CHART_SEMANTIC.unknown,
 };
 
 /** recharts 传给自定义提示框的参数（只列出用到的字段） */
@@ -94,49 +96,32 @@ export function PracticeStats() {
 
     // Get unique difficulties for the bar chart
     const difficulties = stats.difficultyStats.map(d => d.name);
+    const subjectTotal = stats.subjectStats.reduce((sum, entry) => sum + entry.value, 0);
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-2xl font-bold tracking-tight">{t.stats?.title || "Practice Statistics"}</h2>
-
-            {/* Overview Cards */}
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            {t.stats?.totalPractices || "Total Practiced"}
-                        </CardTitle>
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.overallStats.total}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            {t.stats?.correctRate || "Correct Rate"}
-                        </CardTitle>
-                        <Target className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.overallStats.rate}%</div>
-                        <p className="text-xs text-muted-foreground">
-                            {stats.overallStats.correct} / {stats.overallStats.total} {t.stats?.correct || "Correct"}
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            {t.stats?.activeDays || "Active Days (6m)"}
-                        </CardTitle>
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.activityStats.filter(d => d.total > 0).length}</div>
-                    </CardContent>
-                </Card>
+        <div className="space-y-4">
+            {/* 标题由外层 PageHeader 与 Tab 承担，这里只放指标和图表 */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <StatCard
+                    label={t.stats?.totalPractices || "Total Practiced"}
+                    value={stats.overallStats.total}
+                    icon={BookOpen}
+                    tone="primary"
+                />
+                <StatCard
+                    label={t.stats?.correctRate || "Correct Rate"}
+                    value={`${stats.overallStats.rate}%`}
+                    hint={`${stats.overallStats.correct} / ${stats.overallStats.total} ${t.stats?.correct || "Correct"}`}
+                    hintClassName="hidden sm:block"
+                    icon={Target}
+                    tone="success"
+                />
+                <StatCard
+                    label={t.stats?.activeDays || "Active Days (6m)"}
+                    value={stats.activityStats.filter(d => d.total > 0).length}
+                    icon={TrendingUp}
+                    tone="warning"
+                />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -152,18 +137,36 @@ export function PracticeStats() {
                                     data={stats.subjectStats}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    paddingAngle={5}
+                                    innerRadius="36%"
+                                    outerRadius="50%"
+                                    fill="var(--chart-1)"
+                                    paddingAngle={stats.subjectStats.length > 1 ? 4 : 0}
                                     dataKey="value"
-                                    label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                                    stroke="var(--card)"
+                                    strokeWidth={stats.subjectStats.length > 1 ? 2 : 0}
                                 >
                                     {stats.subjectStats.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={chartColor(index)} />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip content={<ChartTooltip />} />
+                                <Legend
+                                    iconType="circle"
+                                    iconSize={8}
+                                    content={() => (
+                                        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-2 text-xs text-muted-foreground">
+                                            {stats.subjectStats.map((entry, index) => (
+                                                <span key={entry.name} className="flex items-center gap-1.5">
+                                                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColor(index) }} />
+                                                    {entry.name}
+                                                    <span className="tabular-nums text-foreground/70">
+                                                        {subjectTotal > 0 ? Math.round((entry.value / subjectTotal) * 100) : 0}%
+                                                    </span>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -177,20 +180,9 @@ export function PracticeStats() {
                     <CardContent className="h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={stats.activityStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                                <XAxis
-                                    dataKey="date"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#6b7280', fontSize: 12 }}
-                                    dy={10}
-                                />
-                                <YAxis
-                                    allowDecimals={false}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#6b7280', fontSize: 12 }}
-                                />
+                                <CartesianGrid {...CHART_GRID} vertical={false} />
+                                <XAxis dataKey="date" {...CHART_AXIS} dy={10} />
+                                <YAxis allowDecimals={false} {...CHART_AXIS} />
                                 <Tooltip content={<CustomTooltip t={t} />} cursor={{ fill: 'transparent' }} />
                                 <Legend
                                     iconType="circle"
@@ -203,7 +195,7 @@ export function PracticeStats() {
                                         dataKey={diff}
                                         name={getDifficultyLabel(diff)}
                                         stackId="a"
-                                        fill={DIFFICULTY_COLORS[diff] || COLORS[index % COLORS.length]}
+                                        fill={DIFFICULTY_COLORS[diff] ?? chartColor(index)}
                                         radius={index === difficulties.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
                                         barSize={32}
                                     />

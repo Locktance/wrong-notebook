@@ -341,9 +341,9 @@ export function UploadZone({ onImageSelect, isAnalyzing }: UploadZoneProps) {
                 className={`group cursor-pointer rounded-2xl border-2 border-dashed shadow-none transition-all hover:border-primary/60 hover:bg-accent/40 ${isDragActive ? "border-primary bg-accent/60" : "border-border bg-card"
                     }`}
             >
-                <CardContent className="flex min-h-[260px] flex-col items-center justify-center space-y-4 py-10 text-center md:min-h-[300px]">
+                <CardContent className="flex min-h-[190px] flex-col items-center justify-center space-y-3 py-7 text-center md:min-h-[210px]">
                     <input {...getInputProps()} />
-                    <div className="rounded-2xl bg-accent p-4 text-primary transition-transform group-hover:scale-105">
+                    <div className="rounded-2xl bg-accent p-3 text-primary transition-transform group-hover:scale-105">
                         {isAnalyzing ? (
                             <Loader2 className="h-10 w-10 animate-spin" />
                         ) : (
@@ -351,7 +351,7 @@ export function UploadZone({ onImageSelect, isAnalyzing }: UploadZoneProps) {
                         )}
                     </div>
                     <div className="space-y-1">
-                        <h3 className="text-lg font-semibold">
+                        <h3 className="text-base font-semibold">
                             {isAnalyzing ? t.app.analyzing : t.upload.analyze}
                         </h3>
                         <p className="text-sm text-muted-foreground">

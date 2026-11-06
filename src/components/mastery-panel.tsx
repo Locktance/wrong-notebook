@@ -109,8 +109,16 @@ export function MasteryPanel({ errorItemId, onMasteryStatusChange }: MasteryPane
                                 <Badge variant="outline">{data.masterySource === "ai" ? t.mastery.aiEvaluated : t.mastery.estimated}</Badge>
                             </span>
                         </div>
-                        <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                            <div className={`h-full ${barColor} transition-all`} style={{ width: `${percent}%` }} />
+                        <div className="relative">
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                                <div className={`h-full ${barColor} transition-all`} style={{ width: `${percent}%` }} />
+                            </div>
+                            {/* 掌握线：越线才算「已掌握」，比纯色条更容易看懂目标在哪 */}
+                            <span
+                                aria-hidden
+                                className="absolute -top-1 h-4 w-px bg-foreground/40"
+                                style={{ left: `calc(${data.masteryThreshold}% - 1px)` }}
+                            />
                         </div>
                         {data.masteryReason && <p className="text-sm text-muted-foreground">{data.masteryReason}</p>}
                         <p className="text-xs text-muted-foreground">{t.mastery.thresholdHint.replace("{threshold}", String(data.masteryThreshold))}</p>

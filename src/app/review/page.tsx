@@ -7,6 +7,7 @@ import { ErrorItemCard } from "@/components/error-list/error-item-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { CardGridSkeleton } from "@/components/ui/skeleton";
 import { Pagination } from "@/components/ui/pagination";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTimeZone } from "@/contexts/TimeZoneContext";
@@ -59,11 +60,7 @@ export default function ReviewPage() {
             />
 
             {!data && (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {Array.from({ length: 6 }, (_, i) => (
-                        <div key={i} className="h-52 animate-pulse rounded-2xl bg-muted" />
-                    ))}
-                </div>
+                <CardGridSkeleton count={6} />
             )}
 
             {data && data.total === 0 && (
