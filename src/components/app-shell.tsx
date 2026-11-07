@@ -58,9 +58,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen">
             <PageSpectrum />
-            {/* 顶栏用实色，底边不做硬分隔线，改为一段很短的下沿渐变，避免和内容之间出现一条「缝」 */}
-            <header className="sticky top-0 z-40 bg-card print:hidden">
-                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-full h-3 bg-gradient-to-b from-card to-transparent" />
+            {/* 顶栏用半透明毛玻璃：页面底色和滚动内容会透上来被虚化，与下方自然衔接，不再是一条实心白条 */}
+            <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl print:hidden">
                 <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 md:h-16 md:px-8">
                     <Link href="/" className="flex shrink-0 items-center gap-2">
                         <Image src="/icons/icon.png" alt="" width={32} height={32} className="rounded-lg" priority unoptimized />
