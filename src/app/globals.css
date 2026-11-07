@@ -159,7 +159,7 @@
 
   /* 底部频谱条：柱条做纵向缩放，形成起伏（页面组件 page-spectrum 里使用） */
   @keyframes spectrum {
-    0%, 100% { transform: scaleY(0.35); opacity: 0.55; }
+    0%, 100% { transform: scaleY(var(--bar-low, 0.35)); opacity: 0.5; }
     50% { transform: scaleY(1); opacity: 1; }
   }
 
