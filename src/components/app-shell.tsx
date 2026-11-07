@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -43,6 +44,15 @@ const NAV_ITEMS: NavItem[] = [
 /** 全局导航外壳：桌面端顶部导航栏，移动端顶部标题栏 + 底部标签栏 */
 export function AppShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname() || "/";
+    // 页面顶端时顶栏透明，滚动后才浮出毛玻璃，避免和下方色带割裂
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
     const { t } = useLanguage();
     const { data: session, status } = useSession();
     const isAdmin = session?.user?.role === "admin";
@@ -58,8 +68,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen">
             <PageSpectrum />
-            {/* 顶栏用半透明毛玻璃：页面底色和滚动内容会透上来被虚化，与下方自然衔接，不再是一条实心白条 */}
-            <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl print:hidden">
+            {/* 顶栏：顶端透明与页面融为一体，滚动后再浮出毛玻璃 */}
+            <header
+                className={`sticky top-0 z-40 transition-colors duration-300 print:hidden ${scrolled ? "bg-background/75 backdrop-blur-xl" : "bg-transparent"}`}
+            >
                 <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 md:h-16 md:px-8">
                     <Link href="/" className="flex shrink-0 items-center gap-2">
                         <Image src="/icons/icon.png" alt="" width={32} height={32} className="rounded-lg" priority unoptimized />
